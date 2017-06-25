@@ -3,6 +3,9 @@
 
 class superInt
 {
-
+    superInt();
+    superInt(int);
+    superInt(&superInt);
+    ~superInt();
 };
 #endif // _SUPER_INT_H
