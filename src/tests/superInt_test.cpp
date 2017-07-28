@@ -12,9 +12,12 @@ using namespace std;
 
 int main()
 {
-    superInt s1 = 3;
-    superInt s2 = 2;
-    ASSERT(s1 == 3)
-    ASSERT(s1 + s2 == 5)
-    ASSERT(s1 * s2 == 6)
+    superInt s1 = 1;
+    superInt s2 = -1;
+    cout<<s1.sign()<<endl;
+    s1.printBinary();
+    s2.printBinary();
+    superInt s3 = s1 + s2;
+    s3.printBinary();
+    return 0;
 }
