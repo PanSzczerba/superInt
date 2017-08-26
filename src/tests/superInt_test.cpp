@@ -12,12 +12,15 @@ using namespace std;
 
 int main()
 {
-    superInt s1 = 1;
-    superInt s2 = -1;
-    cout<<s1.sign()<<endl;
+    superInt s1 = 0x7fffffff;
+    superInt s2 = 0x7fffffff;
+    superInt s3 = s1;
     s1.printBinary();
-    s2.printBinary();
-    superInt s3 = s1 + s2;
+    s3 *= s1;
     s3.printBinary();
-    return 0;
+    s2 = s3 * (-1);
+    s2.printBinary();
+    s2 *= -8;
+    s2.printBinary();
+
 }
