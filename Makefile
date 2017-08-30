@@ -1,7 +1,7 @@
 CCPP=g++
-CPPFLAGS= -I./main -std=c++11
-MAIN=./main
-TEST=./tests
+MAIN=./src/main
+TEST=./src/tests
+CPPFLAGS= -I$(MAIN) -std=c++11
 
 %.o: %.cpp
 	$(CCPP) -c -o $@ $< $(CPPFLAGS)

@@ -3,8 +3,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <exception>
 #include <string>
+#include <stdexcept>
 
 class superInt
 {
