@@ -20,7 +20,7 @@ int main()
     s3.printBinary();
     s2 = s3 * (-1);
     s2.printBinary();
-    s2 *= -8;
+    s2 *= -1;
     s2.printBinary();
 
 }

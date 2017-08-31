@@ -54,7 +54,7 @@ public:
     superInt operator*(const superInt& other) const;
 
     inline std::size_t getLength() { return length*sizeof(uint32_t); }
-    inline short sign() const { return (tblPtr[length - 1] & ((uint32_t)1 << sizeof(uint32_t)*8 - 1)) ? 1 : 0; }
+    inline short sign() const { return (tblPtr[length - 1] & ((uint32_t)1 << (sizeof(uint32_t)*8 - 1))) ? 1 : 0; }
     void printBinary() const;
  //   std::string toString(unsigned int base=10) const throw(std::invalid_argument);
 

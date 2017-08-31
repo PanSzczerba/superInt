@@ -36,7 +36,7 @@ void superInt::printBinary() const
     {
         for(size_t j = 0; j < sizeof(uint32_t)*8; j++)
         {
-            if(tblPtr[length - 1 - i] & ((uint32_t)1 << sizeof(uint32_t)*8 - 1 - j))
+            if(tblPtr[length - 1 - i] & ((uint32_t)1 << (sizeof(uint32_t)*8 - 1 - j)))
                 cout<<"1";
             else
                 cout<<"0";
@@ -85,7 +85,7 @@ void superInt::correct()
 
     for(i = length - 1; i > 0 && tblPtr[i] == (uint32_t)(this_sign ? (-1) : 0); i--);
 
-    if(!(this_sign ^ (short)((tblPtr[i] & ((uint32_t)1 << sizeof(uint32_t)*8 - 1)) ? 1 : 0)))
+    if(!(this_sign ^ (short)((tblPtr[i] & ((uint32_t)1 << (sizeof(uint32_t)*8 - 1))) ? 1 : 0)))
         length = i + 1;
     else
         length = i + 2;

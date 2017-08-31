@@ -1,11 +1,11 @@
 #!/bin/bash
 
-TESTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/src/tests/
+TESTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/src/tests"
 FILES=`ls $TESTDIR`
 
 for FILE in $FILES
 do
-	if [ -x $TESTDIR$FILE ] ; then
-		$TESTDIR$FILE
+	if [ -x $TESTDIR/$FILE ]; then
+		$TESTDIR/$FILE
 	fi
 done 
