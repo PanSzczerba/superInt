@@ -11,7 +11,6 @@ superInt::superInt(uint32_t number)
 {
     length = 1;
     tblLength = 1;
-    while(tblLength < length) tblLength *= 2;
     tblPtr = new uint32_t[tblLength];
     tblPtr[0] = number;
 }
@@ -124,8 +123,12 @@ superInt& superInt::operator=(const superInt& other)
 {
     if(length < other.length)
         extend(other.length);
+    else
+        length = other.length;
 
     memcpy(tblPtr, other.tblPtr, length*sizeof(uint32_t));
+    correct();
+
     return *this;
 }
 
@@ -159,6 +162,83 @@ superInt& superInt::operator^=(const superInt& other)
         tblPtr[i] ^= other.tblPtr[i];
 
     correct();
+    return *this;
+}
+
+superInt& superInt::operator>>=(uint32_t num)
+{
+    short sign = this->sign();
+    uint32_t num_rem = num % (sizeof(uint32_t) * 8);
+    uint32_t num_qnt = num / (sizeof(uint32_t) * 8);
+
+    if(num_qnt >= length)
+        return *this = superInt(sign ? (-1) : 0);
+
+
+    int64_t sshift;
+
+    if(length == num_qnt + 1)
+    {
+        sshift = ((uint64_t)tblPtr[length - 1]) << (sizeof(uint32_t) * 8);
+        sshift >>= num_rem;
+        tblPtr[0] = (uint32_t)(sshift >> (sizeof(uint32_t) * 8));
+        length = 1;
+
+        return *this;
+    }
+    
+    tblPtr[0] = tblPtr[num_qnt] >> num_rem;
+
+    uint64_t shift;
+    size_t i;
+    for(i = num_qnt + 1; i < length - 1; i++)
+    {
+        shift = ((uint64_t)tblPtr[i]) << (sizeof(uint32_t) * 8 - num_rem);
+        tblPtr[i - num_qnt - 1] |= (uint32_t)shift;
+        tblPtr[i - num_qnt] = (uint32_t)(shift >> (sizeof(uint32_t) * 8));
+    }
+
+    sshift = ((uint64_t)tblPtr[i]) << (sizeof(uint32_t) * 8);
+    sshift >>= num_rem;
+    tblPtr[i - num_qnt - 1] |= (uint32_t)sshift;
+    tblPtr[i - num_qnt] = (uint32_t)(sshift >> (sizeof(uint32_t) * 8));
+    length = length - num_qnt;
+
+    correct();
+    return *this;
+}
+
+superInt& superInt::operator<<=(uint32_t num)
+{
+    short sign = this->sign();
+    uint32_t num_rem = num % ((sizeof(uint32_t)) * 8);
+    uint32_t num_qnt = num / ((sizeof(uint32_t)) * 8);
+    uint32_t oldLength = length;
+
+    extend(length + num_qnt + 1);
+
+    uint64_t shift;
+
+    shift = ((sign ? ((uint64_t)0xffffffff << (sizeof(uint32_t) * 8)) : 0) | (uint64_t)tblPtr[oldLength - 1]) << num_rem;
+    if(sign == 0)
+        tblPtr[length - 1] |= (uint32_t)(shift >> (sizeof(uint32_t) * 8));
+    else
+        tblPtr[length - 1] &= (uint32_t)(shift >> (sizeof(uint32_t) * 8));
+    tblPtr[length - 2] = (uint32_t)shift;
+
+    size_t i;
+    for(i = 1; i < oldLength; i++)
+    {
+        shift = (((uint64_t)tblPtr[(oldLength - 1) - i]) << num_rem);
+        tblPtr[(length - 2) - i + 1] |= (uint32_t)(shift >> (sizeof(uint32_t) * 8));
+        tblPtr[(length - 2) - i] = (uint32_t)shift;
+    } 
+    
+    for(; i < length - 1; i++)
+        tblPtr[(length - 2) - i] = 0;
+
+    correct();
+    
     return *this;
 }
 
@@ -508,10 +588,15 @@ superInt& superInt::operator*=(const superInt& other)
 
 superInt& superInt::operator/=(const superInt& other) throw(logic_error)
 {
+    short this_sign = sign();
+    short other_sign = other.sign();
 
+    if(other == 0)
+        throw logic_error("Can't divide by 0");
+    
 }
 
-superInt& superInt::operator/=(int32_t num) throw(logic_error)
+/*superInt& superInt::operator/=(int32_t num) throw(logic_error)
 {
     short this_sign = sign();
     short num_sign;
@@ -527,7 +612,7 @@ superInt& superInt::operator/=(int32_t num) throw(logic_error)
     if(num_sign) num = -num;
 
 
-}
+}*/
 
 superInt superInt::operator|(const superInt& other) const
 {
@@ -551,6 +636,16 @@ superInt superInt::operator^(const superInt& other) const
         return superInt(*this) ^= other;
     else
         return superInt(other) ^= *this;
+}
+
+superInt superInt::operator<<(uint32_t num) const
+{
+    return superInt(*this) <<= num;
+}
+
+superInt superInt::operator>>(uint32_t num) const
+{
+    return superInt(*this) >>= num;
 }
 
 superInt superInt::operator+(const superInt& other) const
@@ -670,6 +765,19 @@ superInt superInt::operator*(const superInt& other) const
     result.correct();
 
     return result;
+}
+
+superInt superInt::operator/(const superInt& other) const throw(logic_error)
+{
+    
+    short this_sign = sign();
+    short other_sign = other.sign();
+
+    if(other == 0)
+        throw logic_error("Can't divide by 0");   
+
+    superInt copy(*this);
+    superInt result;
 }
 
 superInt superInt::operator~() const

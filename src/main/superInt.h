@@ -13,7 +13,7 @@ class superInt
     std::size_t length;
 
 public:
-    superInt(uint32_t= 0);
+    superInt(uint32_t=0);
     superInt(const superInt&);
     ~superInt();
 
@@ -22,6 +22,8 @@ public:
     superInt& operator|=(const superInt& other);
     superInt& operator&=(const superInt& other);
     superInt& operator^=(const superInt& other);
+    superInt& operator>>=(uint32_t num);    // shift right
+    superInt& operator<<=(uint32_t num);    // shift left 
     superInt& negate();
 
     superInt& operator+=(const superInt& other);
@@ -29,14 +31,16 @@ public:
     superInt& operator-=(const superInt& other);
     superInt& operator-=(int32_t num);
     superInt& operator*=(const superInt& other);
-//    superInt& operator*=(int32_t num);
+//  superInt& operator*=(int32_t num);
     superInt& operator/=(const superInt& other) throw(std::logic_error);
-    superInt& operator/=(int32_t num) throw(std::logic_error);
+//  superInt& operator/=(int32_t num) throw(std::logic_error);
 
     superInt operator|(const superInt& other) const;
     superInt operator&(const superInt& other) const;
     superInt operator^(const superInt& other) const;
     superInt operator~() const;
+    superInt operator<<(uint32_t num) const;
+    superInt operator>>(uint32_t num) const;
 
     int compare(const superInt& other) const;
     bool operator<(const superInt& other) const;
@@ -52,6 +56,7 @@ public:
     superInt operator-(const superInt& other) const;
     superInt operator-(uint32_t num) const;
     superInt operator*(const superInt& other) const;
+    superInt operator/(const superInt& other) const throw(std::logic_error);
 
     inline std::size_t getLength() { return length*sizeof(uint32_t); }
     inline short sign() const { return (tblPtr[length - 1] & ((uint32_t)1 << (sizeof(uint32_t)*8 - 1))) ? 1 : 0; }
