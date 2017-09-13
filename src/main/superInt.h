@@ -33,6 +33,7 @@ public:
     superInt& operator*=(const superInt& other);
 //  superInt& operator*=(int32_t num);
     superInt& operator/=(const superInt& other) throw(std::logic_error);
+    superInt& operator%=(const superInt& other) throw(std::logic_error);
 //  superInt& operator/=(int32_t num) throw(std::logic_error);
 
     superInt operator|(const superInt& other) const;
@@ -48,6 +49,7 @@ public:
     bool operator<=(const superInt& other) const;
     bool operator>=(const superInt& other) const;
     bool operator==(const superInt& other) const;
+    bool operator!=(const superInt& other) const;
 
     superInt operator-()const;
 
@@ -57,11 +59,13 @@ public:
     superInt operator-(uint32_t num) const;
     superInt operator*(const superInt& other) const;
     superInt operator/(const superInt& other) const throw(std::logic_error);
-
+    superInt operator%(const superInt& other) const throw(std::logic_error);
     inline std::size_t getLength() { return length*sizeof(uint32_t); }
     inline short sign() const { return (tblPtr[length - 1] & ((uint32_t)1 << (sizeof(uint32_t)*8 - 1))) ? 1 : 0; }
     void printBinary() const;
- //   std::string toString(unsigned int base=10) const throw(std::invalid_argument);
+    std::string toString(unsigned int base=10) const throw(std::invalid_argument);
+
+    friend std::ostream& operator<<(std::ostream& out,const superInt& s);
 
 private:
     void changeTblSize(size_t newTblLength);

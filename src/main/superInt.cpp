@@ -93,31 +93,43 @@ void superInt::correct()
         changeTblSize(tblLength/2);
 }
 
-char numberToChar(int num) throw(invalid_argument)
+char numberToChar(uint32_t num) throw(invalid_argument)
 {
     if(num < 0 || num > 16) throw invalid_argument("numberToChar: Given number is not valid");
     return (char)(num < 10 ? (short)'0' + num : (short)'A' + num - 10);
 }
 
-/*string superInt::toString(unsigned int base) const throw(invalid_argument)
+string superInt::toString(unsigned int base) const throw(invalid_argument)
 {
     if(base < 2 || base > 16) throw invalid_argument("toString: Base can't be below 2 or above 16");
     string str;
-    superInt copy = *this;
+    superInt copy(*this);
+    short sign = this->sign();
+
+    if(sign)
+    {
+        copy.negate();
+        copy += 1;
+    }
 
     while(copy != 0)
     {
-        str.push_back(numberToChar(copy % base));
+        str.push_back(numberToChar((copy % base).tblPtr[0]));
         copy /= base;
     }
 
-    for(size_t i = 0; i < str.length() / 2)
+    if(sign)
+        str.push_back('-');
+
+    for(size_t i = 0; i < str.length() / 2; i++)
     {
         char tmp = str[i];
         str[i] = str[str.length() - 1 - i];
         str[str.length() - 1 - i] = tmp;
     }
-}*/
+
+    return str;
+}
 
 superInt& superInt::operator=(const superInt& other)
 {
@@ -594,25 +606,94 @@ superInt& superInt::operator/=(const superInt& other) throw(logic_error)
     if(other == 0)
         throw logic_error("Can't divide by 0");
     
+    superInt copy(other);
+    superInt result;
+    superInt one(1);
+
+    if(this_sign)
+    {
+        negate();
+        operator+=(1);
+    }
+    if(other_sign)
+    {
+        copy.negate();
+        copy += 1;
+    }
+
+    uint32_t shift = (length - copy.length + 1) * sizeof(uint32_t) * 8;
+    copy <<= shift;
+    one <<= shift;
+
+    for(size_t i = 0; i <= shift; i++)
+    {
+        if(copy <= *this)
+        {
+            *this -= copy;
+            result |= one; 
+        }
+
+        one >>= 1;
+        copy >>= 1;
+    }
+
+    *this = result;
+    if(this_sign ^ other_sign)
+    {
+        negate();
+        operator+=(1);
+    }
+
+    return *this;
 }
 
-/*superInt& superInt::operator/=(int32_t num) throw(logic_error)
+superInt& superInt::operator%=(const superInt& other) throw(logic_error)
 {
     short this_sign = sign();
-    short num_sign;
+    short other_sign = other.sign();
 
-    if(num < 0)
-        num_sign = 1;
-    else
-        num_sign = 0;
+    if(other == 0)
+        throw logic_error("Can't divide by 0");
+    
+    superInt copy(other);
+    superInt result;
+    superInt one(1);
 
-    superInt copy(*this);
+    if(this_sign)
+    {
+        negate();
+        operator+=(1);
+    }
+    if(other_sign)
+    {
+        copy.negate();
+        copy += 1;
+    }
 
-    if(this_sign) copy.negate();
-    if(num_sign) num = -num;
+    uint32_t shift = (length - copy.length + 1) * sizeof(uint32_t) * 8;
+    copy <<= shift;
+    one <<= shift;
 
+    for(size_t i = 0; i <= shift; i++)
+    {
+        if(copy <= *this)
+        {
+            *this -= copy;
+            result |= one; 
+        }
 
-}*/
+        one >>= 1;
+        copy >>= 1;
+    }
+
+    if(this_sign)
+    {
+        negate();
+        operator+=(1);
+    }
+
+    return *this;
+}
 
 superInt superInt::operator|(const superInt& other) const
 {
@@ -770,14 +851,13 @@ superInt superInt::operator*(const superInt& other) const
 superInt superInt::operator/(const superInt& other) const throw(logic_error)
 {
     
-    short this_sign = sign();
-    short other_sign = other.sign();
+    return superInt(*this) /= other;
+}
 
-    if(other == 0)
-        throw logic_error("Can't divide by 0");   
-
-    superInt copy(*this);
-    superInt result;
+superInt superInt::operator%(const superInt& other) const throw(logic_error)
+{
+    
+    return superInt(*this) %= other;
 }
 
 superInt superInt::operator~() const
@@ -829,7 +909,17 @@ bool superInt::operator==(const superInt& other) const
     return (compare(other) == 0);
 }
 
+bool superInt::operator!=(const superInt& other) const
+{
+    return (compare(other) != 0);
+} 
+
 superInt superInt::operator-() const
 {
     return superInt(*this).negate() += 1;
+}
+
+ostream& operator<<(std::ostream& out,const superInt& s)
+{
+    return out<<s.toString();
 }

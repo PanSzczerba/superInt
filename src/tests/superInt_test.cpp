@@ -13,19 +13,10 @@ using namespace std;
 int main()
 {
     superInt s1 = 0x7fffffff;
-    superInt s2 = 0x7fffffff;
-    s1.printBinary();
-    s2.printBinary();
-    s1 <<= 1;
-    s1.printBinary();
-    s2.negate();
-    s2.printBinary();
-    s2 <<= 4;
-    s2.printBinary();
-
-
-    cout<<endl;
-    s1 = s2*(-1);
-    s1.printBinary();
-    (s1 << 123123 >> 123123).printBinary();
+    cout<<s1<<endl;
+    s1 <<= 32;
+    cout<<(((s1 |= 0xffffffff) <<= 32) |= 0xffffffff)<<endl;
+    cout<<(s1 *= 2)<<endl;
+    cout<<(s1 / 2)<<endl;
+    cout<<(-s1)<<endl;
 }
