@@ -2,3 +2,4 @@
 *.a
 *.exe
 src/tests/test
+src/tests/factorial

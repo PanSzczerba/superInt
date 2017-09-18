@@ -14,6 +14,8 @@ class superInt
 
 public:
     superInt(uint32_t=0);
+    explicit superInt(std::string str);
+    explicit superInt(const char* str);
     superInt(const superInt&);
     ~superInt();
 

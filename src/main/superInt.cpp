@@ -13,7 +13,56 @@ superInt::superInt(uint32_t number)
     tblLength = 1;
     tblPtr = new uint32_t[tblLength];
     tblPtr[0] = number;
+
 }
+
+superInt::superInt(const char* str) : superInt()
+{
+    size_t i = 0;
+    short sign = 0;
+    if(str[0] == '-')
+    {
+        i++;
+        sign = 1;
+    }
+    
+    for(; str[i] != '\0'; i++)
+    {
+        operator*=(10);
+        operator+=(str[i] - (uint32_t)'0');
+    }
+    
+    if(sign)
+    {
+        negate();
+        operator+=(1);
+    }
+}
+
+/*superInt::superInt(string str)
+{
+    superInt();
+    
+    size_t i = 0;
+    short sign = 0;
+    if(str[0] == '-')
+    {
+        i++;
+        sign = 1;
+    }
+    
+    for(; i < str.length(); i++)
+    {
+        operator+=(str[i] - (uint32_t)'0');
+        operator*=(10);
+    }
+    
+    if(sign)
+    {
+        negate();
+        operator+=(1);
+    }
+}*/
 
 superInt::superInt(const superInt& other)
 {

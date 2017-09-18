@@ -8,12 +8,16 @@ CPPFLAGS= -Wall -std=c++11
 	$(CXX) -c -o $@ $(INCLUDE) $< $(CPPFLAGS)
 
 all: $(MAIN)/superInt.a \
-     $(TEST)/test
+     $(TEST)/test \
+	 $(TEST)/factorial
 
 $(MAIN)/superInt.a: $(MAIN)/superInt.o
 	ar rvs $@ $<
 	
 $(TEST)/test: $(TEST)/superInt_test.cpp $(MAIN)/superInt.a
+	$(CXX) -o $@ $(INCLUDE) $^ $(CPPFLAGS)
+
+$(TEST)/factorial: $(TEST)/factorial.cpp $(MAIN)/superInt.a
 	$(CXX) -o $@ $(INCLUDE) $^ $(CPPFLAGS)
 
 clean: 
