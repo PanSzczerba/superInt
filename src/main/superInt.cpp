@@ -6,14 +6,18 @@ using namespace std;
 
 #define DEBUG(expr) cout<<#expr<<" = "<<(expr)<<endl;
 #define DEBUGHEX(expr) cout<<hex<<#expr<<" = "<<(expr)<<endl;
+#define UINT32_T_BIT_SIZE 32
 
-superInt::superInt(uint32_t number)
+superInt::superInt(long long int number)
 {
-    length = 1;
-    tblLength = 1;
+    length = sizeof(long long int)/sizeof(uint32_t);
+    tblLength = length;
     tblPtr = new uint32_t[tblLength];
-    tblPtr[0] = number;
-
+ 
+    for(size_t i = 0; i < tblLength; i++)
+        tblPtr[i] = (number >> (i * UINT32_T_BIT_SIZE));
+    
+    correct();
 }
 
 superInt::superInt(const char* str) : superInt()
@@ -318,27 +322,27 @@ superInt& superInt::operator+=(const superInt& other)
     if(length < other.length) //change size if table size is smaller then the other one
         extend(other.length);
 
-    bool carry = false;
+    char carry = 0;
     uint32_t result;
     size_t i;
     for(i = 0; i < other.length; i++)
     {
-        result = other.tblPtr[i] + tblPtr[i] + (carry ? 1 : 0);
+        result = other.tblPtr[i] + tblPtr[i] + carry;
         if(result < tblPtr[i])
-            carry = true;
+            carry = 1;
         else
-            carry = false;
+            carry = 0;
 
         tblPtr[i] = result;
     }
 
     while(i < length)
     {
-        result = tblPtr[i] + (other_sign ? -1 : 0) + (carry ? 1 : 0);
+        result = tblPtr[i] + (other_sign ? -1 : 0) + carry;
         if(result < tblPtr[i])
-            carry = true;
+            carry = 1;
         else
-            carry = false;
+            carry = 0;
         tblPtr[i] = result;
 
         i++;
@@ -360,7 +364,7 @@ superInt& superInt::operator+=(const superInt& other)
     return *this;
 }
 
-superInt& superInt::operator+=(int32_t num)
+/*superInt& superInt::operator+=(int32_t num)
 {
     short this_sign = sign();
     short num_sign;
@@ -407,7 +411,7 @@ superInt& superInt::operator+=(int32_t num)
 
     correct();
     return *this;
-}
+}*/
 
 superInt& superInt::operator-=(const superInt& other)
 {
@@ -458,7 +462,7 @@ superInt& superInt::operator-=(const superInt& other)
     return *this;
 }
 
-superInt& superInt::operator-=(int32_t num)
+/*superInt& superInt::operator-=(int32_t num)
 {
     short this_sign = sign();
     short num_sign;
@@ -505,7 +509,7 @@ superInt& superInt::operator-=(int32_t num)
     correct();
     return *this;
 
-}
+}*/
 
 superInt& superInt::operator*=(const superInt& other)
 {
@@ -518,79 +522,57 @@ superInt& superInt::operator*=(const superInt& other)
 
     uint64_t product;
     uint32_t rest = 0;
-    bool carry = false;
+    short carry = 0;
     uint32_t tmp;
 
     size_t i;
     for(i = 0; i < length; i++)
     {
+        carry = 0;
         rest = 0;
         size_t j;
         for(j = 0; j < other.length; j++)
         {
-            product = (uint64_t)tblPtr[i] * other.tblPtr[j] + rest;
+            product = (uint64_t)tblPtr[i] * other.tblPtr[j] + rest + carry;
 
-            carry = false;
+            carry = 0;
             tmp = result.tblPtr[i + j] + (uint32_t)product;
             if(tmp < result.tblPtr[i + j])
-                carry = true;
+                carry = 1;
             result.tblPtr[i + j] = tmp;
-            for(size_t k = i + j + 1; carry == true && k < result.length; k++)
-            {
-                carry = false;
-                tmp = result.tblPtr[k] + 1;
-                if(tmp < result.tblPtr[k])
-                    carry = true;
-                result.tblPtr[k] = tmp;
-            }
 
             rest = (uint32_t)(product >> 32);
         }
 
         for(;j + i < result.length; j++)
         {
-            product = (uint64_t)tblPtr[i] * (other_sign ? 0xffffffff : 0) + rest;
+            product = (uint64_t)tblPtr[i] * (other_sign ? 0xffffffff : 0) + rest + carry;
 
-            carry = false;
+            carry = 0;
             tmp = result.tblPtr[i + j] + (uint32_t)product;
             if(tmp < result.tblPtr[i + j])
-                carry = true;
+                carry = 1;
             result.tblPtr[i + j] = tmp;
-            for(size_t k = i + j + 1; carry == true && k < result.length; k++)
-            {
-                carry = false;
-                tmp = result.tblPtr[k] + 1;
-                if(tmp < result.tblPtr[k])
-                    carry = true;
-                result.tblPtr[k] = tmp;
-            }
-
+            
             rest = (uint32_t)(product >> 32);
         }
     }
 
     for(; i < result.length; i++)
     {
+        carry = 0;
         rest = 0;
         size_t j;
         for(j = 0; j + i < result.length; j++)
         {
-            carry = false;
-            product = (uint64_t)other.tblPtr[j] * (this_sign ? 0xffffffff : 0)  + rest;
+            product = (uint64_t)other.tblPtr[j] * (this_sign ? 0xffffffff : 0) + rest + carry;
 
+            carry = 0;
             tmp = result.tblPtr[i + j] + (uint32_t)product;
             if(tmp < result.tblPtr[i +j])
-                carry = true;
+                carry = 1;
             result.tblPtr[i + j] = tmp;
-            for(size_t k = i + j + 1; carry == true && k < result.length; k++)
-            {
-                carry = false;
-                tmp = result.tblPtr[k] + 1;
-                if(tmp < result.tblPtr[k])
-                    carry = true;
-                result.tblPtr[k] = tmp;
-            }
-
+            
             rest = (uint32_t)(product >> 32);
         }
     }
@@ -601,7 +583,7 @@ superInt& superInt::operator*=(const superInt& other)
     return *this;
 }
 
-/*superInt& superInt::operator*=(int32_t num)
+/*superInt& superInt::operator*=(long long int num)
 {
     short this_sign = sign();
     short num_sign;
@@ -611,37 +593,68 @@ superInt& superInt::operator*=(const superInt& other)
     else
         num_sign = 0;
 
-    superInt copy;
+    superInt result;
 
-    copy.extend(this->length + 1);
+    result.extend(this->length + sizeof(long long int) / sizeof(uint32_t));
 
     uint64_t product;
     uint32_t rest = 0;
-    bool carry = false;
+    short carry;
+    uint32_t tmp;
 
     size_t i;
     for(i = 0; i < length; i++)
     {
         rest = 0;
-
-        product = (uint64_t)tblPtr[i] * num;
-        copy.tblPtr[i] += (uint32_t)product;
-        rest = (uint32_t)(product >> 32);
-
-        size_t j = 1;
-        for(;j + i < copy.length; j++)
+        size_t j;
+        carry = 0;
+        for (j = 0; j < sizeof(long long int) / sizeof(uint32_t); j++)
         {
-            product = (uint64_t)tblPtr[i] * (num_sign ? -1 : 0) + rest;
+            product = (uint64_t)tblPtr[i] * (uint32_t)(num >> (j * UINT32_T_BIT_SIZE)) + rest + carry;
+            
+            carry = 0;
+            tmp = result.tblPtr[i + j] + (uint32_t)product;
+            if(tmp < result.tblPtr[i + j])
+                carry = 1;
+            result.tblPtr[i + j] = tmp;
 
-            copy.tblPtr[i + j] += (uint32_t)product;
+            rest = (uint32_t)(product >> 32);
+        }
+        
+        for(;j + i < result.length; j++)
+        {
+            product = (uint64_t)tblPtr[i] * (num_sign ? 0xffffffff : 0) + rest + carry;
+
+            carry = 0;
+            tmp = result.tblPtr[i + j] + (uint32_t)product;
+            if(tmp < result.tblPtr[i + j])
+                carry = true;
+            result.tblPtr[i + j] = tmp;
+
             rest = (uint32_t)(product >> 32);
         }
     }
 
-    product = (uint64_t)tblPtr[i] * num;
-    copy.tblPtr[i + 1] += (uint32_t)product;
+    for(; i < result.length; i++)
+    {
+        rest = 0;
+        size_t j;
+        carry = 0;
+        for(j = 0; j + i < result.length; j++)
+        {
+            product = (uint64_t)((uint32_t)(num >> (j * UINT32_T_BIT_SIZE))) * (this_sign ? 0xffffffff : 0) + rest + carry;
 
-    *this = copy;
+            carry = 0;
+            tmp = result.tblPtr[i + j] + (uint32_t)product;
+            if(tmp < result.tblPtr[i +j])
+                carry = true;
+            result.tblPtr[i + j] = tmp;
+
+            rest = (uint32_t)(product >> 32);
+        }
+    }
+
+    *this = result;
     correct();
 
     return *this;
@@ -786,10 +799,10 @@ superInt superInt::operator+(const superInt& other) const
         return superInt(other) += *this;
 }
 
-superInt superInt::operator+(uint32_t num) const
+/*superInt superInt::operator+(uint32_t num) const
 {
     return superInt(*this) += num;
-}
+}*/
 
 superInt superInt::operator-(const superInt& other) const
 {
@@ -799,10 +812,10 @@ superInt superInt::operator-(const superInt& other) const
         return superInt(other) -= *this;
 }
 
-superInt superInt::operator-(uint32_t num) const
+/*superInt superInt::operator-(uint32_t num) const
 {
     return superInt(*this) -= num;
-}
+}*/
 
 superInt superInt::operator*(const superInt& other) const
 {

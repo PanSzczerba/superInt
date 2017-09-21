@@ -13,7 +13,7 @@ class superInt
     std::size_t length;
 
 public:
-    superInt(uint32_t=0);
+    superInt(long long int=0);
     explicit superInt(std::string str);
     explicit superInt(const char* str);
     superInt(const superInt&);
@@ -29,11 +29,11 @@ public:
     superInt& negate();
 
     superInt& operator+=(const superInt& other);
-    superInt& operator+=(int32_t num);
+//  superInt& operator+=(int32_t num);
     superInt& operator-=(const superInt& other);
-    superInt& operator-=(int32_t num);
+//  superInt& operator-=(int32_t num);
     superInt& operator*=(const superInt& other);
-//  superInt& operator*=(int32_t num);
+//  superInt& operator*=(long long int num);
     superInt& operator/=(const superInt& other) throw(std::logic_error);
     superInt& operator%=(const superInt& other) throw(std::logic_error);
 //  superInt& operator/=(int32_t num) throw(std::logic_error);
@@ -56,9 +56,9 @@ public:
     superInt operator-()const;
 
     superInt operator+(const superInt& other) const;
-    superInt operator+(uint32_t num) const;
+//  superInt operator+(uint32_t num) const;
     superInt operator-(const superInt& other) const;
-    superInt operator-(uint32_t num) const;
+//  superInt operator-(uint32_t num) const;
     superInt operator*(const superInt& other) const;
     superInt operator/(const superInt& other) const throw(std::logic_error);
     superInt operator%(const superInt& other) const throw(std::logic_error);
@@ -68,7 +68,7 @@ public:
     std::string toString(unsigned int base=10) const throw(std::invalid_argument);
 
     friend std::ostream& operator<<(std::ostream& out,const superInt& s);
-
+    
 private:
     void changeTblSize(size_t newTblLength);
     void extend(size_t newLength) throw(std::logic_error);

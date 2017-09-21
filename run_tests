@@ -6,6 +6,8 @@ FILES=`ls $TESTDIR`
 for FILE in $FILES
 do
 	if [ -x $TESTDIR/$FILE ]; then
+        echo "$FILE -------------------"
 		$TESTDIR/$FILE
+        echo "-------------------------"
 	fi
 done 

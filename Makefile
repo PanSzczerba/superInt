@@ -3,9 +3,10 @@ MAIN=./src/main
 TEST=./src/tests
 INCLUDE= -I$(MAIN)
 CPPFLAGS= -Wall -std=c++11
+OPT=
 
 %.o: %.cpp
-	$(CXX) -c -o $@ $(INCLUDE) $< $(CPPFLAGS)
+	$(CXX) -c -o $@ $(INCLUDE) $< $(CPPFLAGS) $(OPT)
 
 all: $(MAIN)/superInt.a \
      $(TEST)/test \
@@ -15,10 +16,10 @@ $(MAIN)/superInt.a: $(MAIN)/superInt.o
 	ar rvs $@ $<
 	
 $(TEST)/test: $(TEST)/superInt_test.cpp $(MAIN)/superInt.a
-	$(CXX) -o $@ $(INCLUDE) $^ $(CPPFLAGS)
+	$(CXX) -o $@ $(INCLUDE) $^ $(CPPFLAGS) $(OPT)
 
 $(TEST)/factorial: $(TEST)/factorial.cpp $(MAIN)/superInt.a
-	$(CXX) -o $@ $(INCLUDE) $^ $(CPPFLAGS)
+	$(CXX) -o $@ $(INCLUDE) $^ $(CPPFLAGS) $(OPT)
 
 clean: 
 	rm -f $(MAIN)/*.o

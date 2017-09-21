@@ -5,7 +5,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    superInt num;
+    long long int num;
     if(argc < 2)
         num = 100;
     else
@@ -19,8 +19,8 @@ int main(int argc, char** argv)
     
     superInt factorial(1);
 
-    for(superInt i = 2; i < num; i += 1)
+    for(int i = 2; i < num; i += 1)
         factorial *= i;
 
-    cout<<factorial<<endl;
+//  cout<<factorial<<endl;
 }

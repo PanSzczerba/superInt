@@ -12,13 +12,7 @@ using namespace std;
 
 int main()
 {
-    superInt s1("1111111111111111111111111111111111");
+    superInt s1("1111111111111111111111111");
     cout<<s1<<endl;
-    cout<<(-s1)<<endl;
-    cout<<(s1*9)<<endl;
-    cout<<(s1 << 2)<<"\n\n";
-
-    superInt s2("2222222222222222222222222222222222");
-    cout<<s2<<endl;
-    cout<<(s2*s1)<<endl;
+    cout<<(s1 *= 12)<<endl;
 }
